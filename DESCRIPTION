@@ -1,0 +1,28 @@
+Package: forthetrees
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Michael",
+           family = "Mahoney",
+           role = c("aut", "cre"),
+           email = "mike.mahoney.218@gmail.com",
+           comment = c(ORCID = "0000-0003-2402-304X"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+VignetteBuilder: knitr
+Suggests: 
+    knitr,
+    codemetar,
+    pkgdown,
+    rmarkdown,
+    lintr,
+    styler
+SystemRequirements: 
+    Blender,
+    Python (>= 3)
