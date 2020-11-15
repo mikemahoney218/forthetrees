@@ -26,3 +26,17 @@ Suggests:
 SystemRequirements: 
     Blender,
     Python (>= 3)
+Imports: 
+    terrainr,
+    methods,
+    grDevices,
+    sp,
+    raster
+Collate: 
+    'ftt_mvdf.R'
+    'classes.R'
+    'ftt_create_blender_endmatter.R'
+    'ftt_create_blender_frontmatter.R'
+    'ftt_create_cakepop_trees.R'
+    'ftt_execute_render.R'
+    'ftt_fia_to_treesize.R'
