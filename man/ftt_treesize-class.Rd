@@ -46,7 +46,6 @@ objects may be inserted here.}
 
 \seealso{
 Other classes and related functions: 
-\code{\link{ftt_mvdf-class}},
 \code{\link{ftt_tree-class}}
 }
 \concept{classes and related functions}

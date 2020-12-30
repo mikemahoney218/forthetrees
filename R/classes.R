@@ -4,11 +4,12 @@
 #' @template mvdf
 #'
 #' @family classes and related functions
-#' @include ftt_mvdf.R
+#'
+#' @importClassesFrom mvdf mvdf_obj
 #'
 #' @exportClass ftt_treesize
 methods::setClass("ftt_treesize",
-  contains = "ftt_mvdf",
+  contains = "mvdf_obj",
   slots = c(
     dbh = "numeric",
     height = "numeric",

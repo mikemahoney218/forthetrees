@@ -46,7 +46,6 @@ different rendering functions.}
 
 \seealso{
 Other classes and related functions: 
-\code{\link{ftt_mvdf-class}},
 \code{\link{ftt_treesize-class}}
 }
 \concept{classes and related functions}

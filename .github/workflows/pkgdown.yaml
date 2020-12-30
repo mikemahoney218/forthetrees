@@ -32,7 +32,7 @@ jobs:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-          
+
       - name: Install system dependencies
         run: |
           while read -r cmd
@@ -42,6 +42,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          remotes::install_github("mikemahoney218/mvdf")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_github("r-lib/pkgdown")
         shell: Rscript {0}

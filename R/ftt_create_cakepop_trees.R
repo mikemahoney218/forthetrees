@@ -36,7 +36,7 @@ ftt_create_cakepop_trees <- function(frontmatter, object, crowntype = "uv") {
   # https://www.fs.fed.us/ne/newtown_square/publications/research_papers/pdfs/scanned/OCR/ne_rp610.pdf # nolint
   tree_mvdf[which(
     is.na(tree_mvdf$crown_radius)),
-    ]$crown_radius <- 0.833 + (7 * tree_mvdf[which(
+    ]$crown_radius <- 0.833 + (0.07 * tree_mvdf[which(
       is.na(tree_mvdf$crown_radius)),
     ]$dbh)
 

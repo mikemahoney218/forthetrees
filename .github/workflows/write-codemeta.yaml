@@ -36,6 +36,7 @@ jobs:
       - name: Install codemetar
         run: |
           install.packages("remotes")
+          remotes::install_github("mikemahoney218/mvdf")
           remotes::install_local(".")
           remotes::install_cran("codemetar")
         shell: Rscript {0}
