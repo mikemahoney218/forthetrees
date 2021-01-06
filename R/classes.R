@@ -9,7 +9,7 @@
 #'
 #' @exportClass ftt_treesize
 methods::setClass("ftt_treesize",
-  contains = "mvdf_obj",
+  contains = "mvdf_simple_material",
   slots = c(
     dbh = "numeric",
     height = "numeric",
@@ -18,55 +18,69 @@ methods::setClass("ftt_treesize",
   )
 )
 
-#' @export
-ftt_treesize <- function(data, metadata = data.frame(), appendix = list()) {
-
-  methods::new("ftt_treesize",
-      idx = as.character(data$idx),
-      x = as.double(data$x),
-      y = as.double(data$y),
-      z = as.double(data$z),
-      dbh = as.double(data$dbh),
-      height = as.double(data$height),
-      crown = as.logical(data$crown),
-      crown_radius = as.double(data$crown_radius),
-      metadata = as.data.frame(metadata),
-      appendix = as.list(appendix)
-      )
-
-}
-
-#' S4 class for trees to be modeled
+#' Create an `ftt_treesize` object
 #'
-#' @template mvdf
-#' @template treesize
+#' @param data Optionally, a data frame containing all the data necessary to
+#' create an `ftt_treesize` object. If `NULL`, all other arguments are
+#' interpreted as data to use in constructing the object; if not `NULL`,
+#' arguments are interpreted as the names of columns in `data` containing the
+#' values for each slot.
+#' @param dbh Numeric: diameter at breast height, in meters. May include missing
+#' values, which will be handled differently by different rendering functions.
+#' @param height Numeric: bole height, in meters. May include missing values,
+#' which will be handled differently by different rendering functions. Height is
+#' understood as the total height of the object to be rendered (top of the stem
+#' and crown, if applicable); different importer functions may determine this
+#' differently.
+#' @param crown Logical: does the tree have leaves? May include missing values,
+#' which will be handled differently by different rendering functions.
+#' @param crown_radius Numeric: radius of the crown, in meters, at its widest
+#' point. May include missing values, which will be handled differently by
+#' different rendering functions.
+#' @param ... Additional arguments passed to [mvdf::mvdf_simple_material].
+#' @param translate_colors Boolean passed to [mvdf::mvdf_simple_material].
 #'
-#' @family classes and related functions
-#'
-#' @exportClass ftt_tree
-methods::setClass("ftt_tree",
-  contains = c("ftt_treesize")
-)
-
-#' Test to ensure an object meets minimal content requirements
-#'
-#' @param object The object to test.
-#' @param class The S4 class (as a character string) with the slots that
-#' `object` needs to have.
-#' @param error Logical: Should the function error if the object doesn't contain
-#' the other class, or return `FALSE`? Default to `FALSE` (do not error).
+#' @return An object of class `ftt_treesize`.
 #'
 #' @export
-ftt_contains <- function(object, class, error = FALSE) {
+ftt_treesize <- function(data = NULL,
+                         dbh = "dbh",
+                         height = "height",
+                         crown = "crown",
+                         crown_radius = "crown_radius",
+                         ...) {
 
-  res <- isS4(object) && methods::is(object, class2 = class)
+  res <- mvdf::mvdf_simple_material(data = data, ...)
+  res_mvdf <- mvdf::mvdf(res)
 
-  if (error && !res) {
-    stop(deparse(substitute(object)),
-         " must have all slots from ",
-         class)
+  if (!is.null(data)) {
+    dbh <- eval_arg(data, dbh)
+    height <- eval_arg(data, height)
+    crown <- eval_arg(data, crown)
+    crown_radius <- eval_arg(data, crown_radius)
   }
 
-  return(res)
+  length_out <- length(res_mvdf$idx)
+
+  dbh <- calc_val(dbh, length_out, 0.381)
+  height <- calc_val(height, length_out, 20)
+  crown <- calc_val(crown, length_out, 9.25)
+  crown_radius <- calc_val(crown_radius, length_out, TRUE)
+
+  methods::new("ftt_treesize",
+               x = as.double(res_mvdf$x),
+               y = as.double(res_mvdf$y),
+               z = as.double(res_mvdf$z),
+               idx = as.character(res_mvdf$idx),
+               metadata = as.data.frame(metadata(res)),
+               appendix = as.list(appendix(res)),
+               diffuse_color = as.character(res_mvdf$diffuse_color),
+               metallic = as.numeric(res_mvdf$metallic),
+               roughness = as.numeric(res_mvdf$roughness),
+               dbh = as.double(dbh),
+               height = as.double(height),
+               crown = as.logical(crown),
+               crown_radius = as.double(crown_radius)
+               )
 
 }

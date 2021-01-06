@@ -44,8 +44,4 @@ object. Not validated; any additional outputs that don't map to modeled
 objects may be inserted here.}
 }}
 
-\seealso{
-Other classes and related functions: 
-\code{\link{ftt_tree-class}}
-}
 \concept{classes and related functions}

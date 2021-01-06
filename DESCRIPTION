@@ -31,4 +31,5 @@ Imports:
     sp,
     raster,
     mvdf,
-    glue
+    glue,
+    rlang
