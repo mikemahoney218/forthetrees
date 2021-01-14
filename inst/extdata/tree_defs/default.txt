@@ -1,0 +1,1 @@
+bpy.ops.curve.tree_add(bevel=True)
