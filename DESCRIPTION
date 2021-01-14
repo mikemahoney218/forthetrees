@@ -32,4 +32,6 @@ Imports:
     raster,
     mvdf,
     glue,
-    rlang
+    rlang,
+    duckdb,
+    DBI
