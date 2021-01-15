@@ -71,3 +71,28 @@ is_missing <- function(obj) {
     is.nan(obj) |
     length(obj) == 0
 }
+
+
+.onLoad <- function(libname, pkgname) {
+  if (!dir.exists(tools::R_user_dir(package = "forthetrees"))) {
+    dir.create(tools::R_user_dir(package = "forthetrees"), recursive = TRUE)
+  }
+  if (file.exists(paste0(tools::R_user_dir("forthetrees"), "/treedb.db"))) {
+    file.remove(paste0(tools::R_user_dir("forthetrees"), "/treedb.db"))
+  }
+  db_path <- system.file("extdata/treedb",
+                         package = "forthetrees",
+                         mustWork = TRUE)
+  schema <- readLines(paste0(db_path, "/schema.sql"))
+  schema <- schema[schema != ""]
+  loadsql <- readLines(paste0(db_path, "/load.sql"))
+  loadsql <- loadsql[loadsql != ""]
+  loadsql <- gsub("inst/extdata/treedb", db_path, loadsql)
+  con <- DBI::dbConnect(
+    duckdb::duckdb(),
+    dbdir = paste0(tools::R_user_dir("forthetrees"), "/treedb.db"))
+  invisible(lapply(schema, function(x) DBI::dbExecute(con, x)))
+  invisible(lapply(loadsql, function(x) DBI::dbExecute(con, x)))
+  DBI::dbDisconnect(con, shutdown = TRUE)
+  invisible(NULL)
+}

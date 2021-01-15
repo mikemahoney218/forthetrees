@@ -38,7 +38,6 @@ methods::setClass("ftt_treesize",
 #' point. May include missing values, which will be handled differently by
 #' different rendering functions.
 #' @param ... Additional arguments passed to [mvdf::mvdf_simple_material].
-#' @param translate_colors Boolean passed to [mvdf::mvdf_simple_material].
 #'
 #' @return An object of class `ftt_treesize`.
 #'
@@ -48,9 +47,11 @@ ftt_treesize <- function(data = NULL,
                          height = "height",
                          crown = "crown",
                          crown_radius = "crown_radius",
-                         ...) {
+                         ...,
+                         translate_colors = FALSE) {
 
-  res <- mvdf::mvdf_simple_material(data = data, ...)
+  res <- mvdf::mvdf_simple_material(data = data,
+                                    ...)
   res_mvdf <- mvdf::mvdf(res)
 
   if (!is.null(data)) {
@@ -72,8 +73,8 @@ ftt_treesize <- function(data = NULL,
                y = as.double(res_mvdf$y),
                z = as.double(res_mvdf$z),
                idx = as.character(res_mvdf$idx),
-               metadata = as.data.frame(metadata(res)),
-               appendix = as.list(appendix(res)),
+               metadata = as.data.frame(mvdf::metadata(res)),
+               appendix = as.list(mvdf::appendix(res)),
                diffuse_color = as.character(res_mvdf$diffuse_color),
                metallic = as.numeric(res_mvdf$metallic),
                roughness = as.numeric(res_mvdf$roughness),

@@ -10,7 +10,8 @@ ftt_treesize(
   height = "height",
   crown = "crown",
   crown_radius = "crown_radius",
-  ...
+  ...,
+  translate_colors = FALSE
 )
 }
 \arguments{
@@ -37,8 +38,6 @@ point. May include missing values, which will be handled differently by
 different rendering functions.}
 
 \item{...}{Additional arguments passed to \link[mvdf:mvdf_simple_material]{mvdf::mvdf_simple_material}.}
-
-\item{translate_colors}{Boolean passed to \link[mvdf:mvdf_simple_material]{mvdf::mvdf_simple_material}.}
 }
 \value{
 An object of class \code{ftt_treesize}.

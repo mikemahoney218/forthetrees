@@ -2,6 +2,11 @@
 
 export(ftt_add_cakepop)
 export(ftt_add_sapling)
+export(ftt_common_name_sapling_lookup)
+export(ftt_fia_sapling_lookup)
+export(ftt_genus_sapling_lookup)
+export(ftt_plants_sapling_lookup)
+export(ftt_species_sapling_lookup)
 export(ftt_treesize)
 exportClasses(ftt_treesize)
 exportMethods(ftt_add_cakepop_method)
