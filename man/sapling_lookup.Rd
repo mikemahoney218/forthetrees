@@ -19,19 +19,19 @@ ftt_species_sapling_lookup(species)
 ftt_genus_sapling_lookup(genus)
 }
 \arguments{
-\item{fia_code}{The FIA species code (See appendix F of Burrill et al. 2018)
+\item{fia_code}{The FIA species codes (See appendix F of Burrill et al. 2018)
 to search for.}
 
-\item{plants_code}{The USDA PLANTS species code (USDA 2021)
+\item{plants_code}{The USDA PLANTS species codes (USDA 2021)
 to search for.}
 
-\item{common_name}{The common name used to identify a particular species
+\item{common_name}{The common names used to identify a particular species
 (See appendix F of Burrill et al. 2018) to search for.}
 
-\item{species}{The species to lookup, as a single string in the format
+\item{species}{The species to lookup, as a string in the format
 \verb{genus species} (See appendix F of Burrill et al. 2018) to search for.}
 
-\item{genus}{The genus to search for.}
+\item{genus}{The genera to search for.}
 }
 \value{
 The Python command used to generate renders for the given lookup.

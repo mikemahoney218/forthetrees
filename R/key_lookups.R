@@ -9,12 +9,13 @@
 #' @return The Python command used to generate renders for the given code.
 #'
 ftt_generic_sapling_lookup <- function(code, alias, genus = NULL) {
-  if (length(code) != 1) stop("Only one key can be looked up per call.")
+  if (alias == "species") stopifnot(length(code) == length(genus))
   con <- DBI::dbConnect(duckdb::duckdb(),
                         dbdir = paste0(
                           tools::R_user_dir(package = "forthetrees"),
                           "/treedb.db"
-                          )
+                          ),
+                        read_only = TRUE
   )
 
   query <- switch(alias,
@@ -47,8 +48,10 @@ FROM {table} tbl
     LEFT JOIN genus_lookup gn ON sp.genus = gn.genus
     LEFT JOIN sapling_tree_defs std
         ON COALESCE(sp.render_key, gn.render_key, 'default') = std.render_key
-WHERE tbl.{lookup} = ?;
+WHERE tbl.{lookup} IN (?);
                   ")
+
+  default_query <- "SELECT render_call FROM sapling_tree_defs WHERE render_key = 'default';" # nolint
 
   query <- glue::glue(
     query,
@@ -56,22 +59,34 @@ WHERE tbl.{lookup} = ?;
     lookup = alias
   )
 
+  call_command <- vector("character", length(code))
   render_call <- DBI::dbSendQuery(con, query)
-  if (alias == "species") {
-    DBI::dbBind(render_call, list(code, genus))
-  } else {
-    DBI::dbBind(render_call, list(code))
+
+  for (i in seq_len(length(code))) {
+
+    if (alias == "species") {
+      arg_list <- list(code[[i]], genus[[i]])
+    } else {
+      arg_list <- list(code[[i]])
+    }
+
+    DBI::dbBind(render_call, arg_list)
+    query_out <- DBI::dbFetch(render_call)
+
+    if (is_missing(query_out[1, 1])) {
+      query_out <- DBI::dbGetQuery(con, default_query)
+    }
+
+    call_command[[i]] <- query_out[1, 1]
+
   }
-  call_command <- DBI::dbFetch(render_call)
+
   DBI::dbClearResult(render_call)
-  if (is_missing(call_command[1, 1])) {
-    call_command <- DBI::dbGetQuery(
-      con,
-      "SELECT render_call FROM sapling_tree_defs WHERE render_key = 'default';"
-    )
-  }
   DBI::dbDisconnect(con, shutdown = TRUE)
-  call_command[1, 1]
+
+  names(call_command) <- code
+  call_command
+
 }
 
 
@@ -85,15 +100,15 @@ WHERE tbl.{lookup} = ?;
 #' case. If no render method has been defined for the lookup value, a default
 #' method is returned.
 #'
-#' @param fia_code The FIA species code (See appendix F of Burrill et al. 2018)
+#' @param fia_code The FIA species codes (See appendix F of Burrill et al. 2018)
 #' to search for.
-#' @param plants_code The USDA PLANTS species code (USDA 2021)
+#' @param plants_code The USDA PLANTS species codes (USDA 2021)
 #' to search for.
-#' @param common_name The common name used to identify a particular species
+#' @param common_name The common names used to identify a particular species
 #' (See appendix F of Burrill et al. 2018) to search for.
-#' @param species The species to lookup, as a single string in the format
+#' @param species The species to lookup, as a string in the format
 #' `genus species` (See appendix F of Burrill et al. 2018) to search for.
-#' @param genus The genus to search for.
+#' @param genus The genera to search for.
 #'
 #' @return The Python command used to generate renders for the given lookup.
 #'

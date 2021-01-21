@@ -38,6 +38,8 @@ methods::setClass("ftt_treesize",
 #' point. May include missing values, which will be handled differently by
 #' different rendering functions.
 #' @param ... Additional arguments passed to [mvdf::mvdf_simple_material].
+#' @param translate_colors Passed to [mvdf::mvdf_simple_material] (but included
+#' as a separate argument to help with auto-complete).
 #'
 #' @return An object of class `ftt_treesize`.
 #'
@@ -51,6 +53,7 @@ ftt_treesize <- function(data = NULL,
                          translate_colors = FALSE) {
 
   res <- mvdf::mvdf_simple_material(data = data,
+                                    translate_colors = translate_colors,
                                     ...)
   res_mvdf <- mvdf::mvdf(res)
 

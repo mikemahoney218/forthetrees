@@ -38,6 +38,9 @@ point. May include missing values, which will be handled differently by
 different rendering functions.}
 
 \item{...}{Additional arguments passed to \link[mvdf:mvdf_simple_material]{mvdf::mvdf_simple_material}.}
+
+\item{translate_colors}{Passed to \link[mvdf:mvdf_simple_material]{mvdf::mvdf_simple_material} (but included
+as a separate argument to help with auto-complete).}
 }
 \value{
 An object of class \code{ftt_treesize}.

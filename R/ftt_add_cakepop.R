@@ -99,7 +99,6 @@ setMethod(
 
 #' @rdname ftt_add_cakepop
 #' @importClassesFrom mvdf mvdf_simple_material
-#' @export
 setMethod(
   "ftt_add_cakepop_method",
   "ftt_treesize",
