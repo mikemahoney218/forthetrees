@@ -11,7 +11,9 @@ ftt_generic_sapling_lookup(code, alias, genus = NULL)
 
 \item{alias}{A string indicating the calling alias function -- "fia_code" for
 ftt_fia_sapling_lookup, "plants_code" for ftt_plants_sapling_lookup,
-"common_name" for ftt_common_name_sapling_lookup.}
+"common_name" for ftt_common_name_sapling_lookup,
+"genus" for ftt_genus_sapling_lookup, or "species" for
+ftt_species_sapling_lookup.}
 
 \item{genus}{For the species lookup method only, the genus to match on.}
 }

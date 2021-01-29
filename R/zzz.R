@@ -72,6 +72,77 @@ is_missing <- function(obj) {
     length(obj) == 0
 }
 
+#' Build the location commands for classes inheriting from `mvdf_obj`
+#'
+#' @param object An object inheriting from `mvdf_obj`
+#'
+#' @family utilities
+#'
+#' @keywords internal
+move_location <- function(mvdf_df) {
+  outstr <- apply(
+    mvdf_df,
+    1,
+    function(x) {
+      treestr <- "bpy.data.objects[-1].location = mathutils.Vector(({xloc}, {yloc}, {zloc}))" # nolint
+
+      treestr
+    }
+  )
+
+  mapply(
+    function(string, x, y, z) {
+      glue::glue(
+        string,
+        xloc = x,
+        yloc = y,
+        zloc = z
+      )
+    },
+    string = outstr,
+    x = mvdf_df$x,
+    y = mvdf_df$y,
+    z = mvdf_df$z
+  )
+
+}
+
+#' Create an options string from a ... object
+#'
+#' @param dts The results of list(...) to create an options string from
+#'
+#' @keywords internal
+create_options <- function(dts) {
+  paste0(
+    do.call(
+      paste,
+      c(
+        mapply(
+          function(nm, ob) paste0(nm, "=", ob),
+          names(dts),
+          dts,
+          SIMPLIFY = FALSE
+        ),
+        sep = ","
+      )
+    ),
+    ", "
+  )
+}
+
+#' Convert R logical values to Python equivalents
+#'
+#' @param dots The results of running `list(...)` in an exporter function.
+#'
+#' @family utilities
+#'
+#' @keywords internal
+pythonize_booleans <- function(dots) {
+  # friendly conversion from R logicals to Python
+  dots[which(is.logical(dots) && dots == FALSE)] <- "False"
+  dots[which(is.logical(dots) && dots == TRUE)] <- "True"
+  dots
+}
 
 .onLoad <- function(libname, pkgname) {
   if (!dir.exists(tools::R_user_dir(package = "forthetrees"))) {

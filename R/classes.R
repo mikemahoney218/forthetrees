@@ -5,7 +5,7 @@
 #'
 #' @family classes and related functions
 #'
-#' @importClassesFrom mvdf mvdf_obj
+#' @importClassesFrom mvdf mvdf_simple_material
 #'
 #' @exportClass ftt_treesize
 methods::setClass("ftt_treesize",
@@ -88,3 +88,95 @@ ftt_treesize <- function(data = NULL,
                )
 
 }
+
+#' S4 class for tree species: ID codes and keys to look up rendering methods.
+#'
+#' @template treespp
+#' @template mvdf
+#'
+#' @family classes and related functions
+#'
+#' @importClassesFrom mvdf mvdf_obj
+#'
+#' @exportClass ftt_treespp
+methods::setClass("ftt_treespp",
+                  contains = "mvdf_obj",
+                  slots = c(
+                    id_code = "character",
+                    id_key = "character"
+                  )
+)
+
+setValidity("ftt_treespp", function(object) {
+  error <- vector("character")
+  n_issue <- 1
+
+  id_code_opts <- c("fia_code",
+                    "plants_code",
+                    "common_name",
+                    "species",
+                    "genus")
+
+  if (!(all(object@id_code %in% id_code_opts))) {
+    error[n_issue] <- paste("@id_code must be one of: ",
+                            paste0(id_code_opts,
+                                   collapse = ", "))
+    n_issue <- n_issue + 1
+  }
+
+  if (n_issue > 1) {
+    return(paste0(error, collapse = "\n"))
+  }
+
+  return(TRUE)
+
+})
+
+
+#' Create an `ftt_treespp` object
+#'
+#' @param data Optionally, a data frame containing all the data necessary to
+#' create an `ftt_treespp` object. If `NULL`, all other arguments are
+#' interpreted as data to use in constructing the object; if not `NULL`,
+#' arguments are interpreted as the names of columns in `data` containing the
+#' values for each slot.
+#' @param id_code The code indicating what sort of identifier is stored in
+#' id_key -- one of fia_code, plants_code, common_name, genus, or species.
+#' @param id_key The key identifying the tree species in the schema referenced
+#' by id_code.
+#' @param ... Additional arguments passed to [mvdf::mvdf_obj].
+#'
+#' @return An object of class `ftt_treespp`.
+#'
+#' @export
+ftt_treespp <- function(data = NULL,
+                        id_code = "id_code",
+                        id_key = "id_key",
+                        ...) {
+
+  res <- mvdf::mvdf_obj(data = data, ...)
+  res_mvdf <- mvdf::mvdf(res)
+
+  if (!is.null(data)) {
+    id_code <- eval_arg(data, id_code)
+    id_key <- eval_arg(data, id_key)
+  }
+
+  length_out <- length(res_mvdf$idx)
+
+  id_code <- calc_val(id_code, length_out, "species")
+  id_key <- calc_val(id_key, length_out, " ")
+
+  methods::new("ftt_treespp",
+               x = as.double(res_mvdf$x),
+               y = as.double(res_mvdf$y),
+               z = as.double(res_mvdf$z),
+               idx = as.character(res_mvdf$idx),
+               metadata = as.data.frame(mvdf::metadata(res)),
+               appendix = as.list(mvdf::appendix(res)),
+               id_code = as.character(id_code),
+               id_key = as.character(id_key)
+               )
+
+}
+

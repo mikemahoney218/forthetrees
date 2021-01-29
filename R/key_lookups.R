@@ -3,23 +3,37 @@
 #' @param code The code to look up -- FIA code, PLANTS shortcode, or common name
 #' @param alias A string indicating the calling alias function -- "fia_code" for
 #' ftt_fia_sapling_lookup, "plants_code" for ftt_plants_sapling_lookup,
-#' "common_name" for ftt_common_name_sapling_lookup.
+#' "common_name" for ftt_common_name_sapling_lookup,
+#' "genus" for ftt_genus_sapling_lookup, or "species" for
+#' ftt_species_sapling_lookup.
 #' @param genus For the species lookup method only, the genus to match on.
 #'
 #' @return The Python command used to generate renders for the given code.
 #'
-ftt_generic_sapling_lookup <- function(code, alias, genus = NULL) {
-  if (alias == "species") stopifnot(length(code) == length(genus))
-  con <- DBI::dbConnect(duckdb::duckdb(),
-                        dbdir = paste0(
-                          tools::R_user_dir(package = "forthetrees"),
-                          "/treedb.db"
-                          ),
-                        read_only = TRUE
+ftt_generic_sapling_lookup <- function(code, alias) {
+
+  if (is.character(code)) code <- tolower(code)
+
+  lookup_tbl <- data.frame(
+    code = code,
+    alias = alias
   )
 
-  query <- switch(alias,
-                  "genus" = "
+  merge_cols <- c("code", "alias")
+
+  if (any(alias == "species")) {
+    merge_cols <- c(merge_cols, "genus")
+    lookup_tbl$code <- strsplit(lookup_tbl$code, " ")
+    lookup_tbl$genus <- lookup_tbl$code[[1]][[1]]
+    lookup_tbl$code <- paste0(utils::tail(lookup_tbl$code[[1]], -1), collapse = " ")
+  }
+
+  unique_lookup <- unique(lookup_tbl)
+  unique_lookup$query <- vapply(
+    unique_lookup$alias,
+    function(alias) {
+      switch(alias,
+             "genus" = "
 SELECT
     std.render_call
 FROM {table} gn
@@ -27,7 +41,7 @@ FROM {table} gn
         ON COALESCE(gn.render_key, 'default') = std.render_key
 WHERE gn.{lookup} = ?;
                   ",
-                  "species" = "
+             "species" = "
 SELECT
     std.render_call
 FROM {table} sp
@@ -38,7 +52,7 @@ WHERE
     sp.{lookup} = ?
         AND sp.genus = ?;
                   ",
-                  "
+             "
 SELECT
     std.render_call
 FROM {table} tbl
@@ -50,42 +64,61 @@ FROM {table} tbl
         ON COALESCE(sp.render_key, gn.render_key, 'default') = std.render_key
 WHERE tbl.{lookup} IN (?);
                   ")
+    },
+    character(1))
+
+  unique_lookup$query <- mapply(
+    function(query, alias) {
+      glue::glue(
+        query,
+        table = paste0(alias, "_lookup"),
+        lookup = alias
+      )
+    },
+    query = unique_lookup$query,
+    alias = unique_lookup$alias
+  )
+
+  con <- DBI::dbConnect(duckdb::duckdb(),
+                        dbdir = paste0(
+                          tools::R_user_dir(package = "forthetrees"),
+                          "/treedb.db"
+                          ),
+                        read_only = TRUE
+  )
 
   default_query <- "SELECT render_call FROM sapling_tree_defs WHERE render_key = 'default';" # nolint
 
-  query <- glue::glue(
-    query,
-    table = paste0(alias, "_lookup"),
-    lookup = alias
-  )
+  unique_lookup$call_command <- NA_character_
 
-  call_command <- vector("character", length(code))
-  render_call <- DBI::dbSendQuery(con, query)
+  for (i in seq_len(nrow(unique_lookup))) {
 
-  for (i in seq_len(length(code))) {
-
-    if (alias == "species") {
-      arg_list <- list(code[[i]], genus[[i]])
+    if (unique_lookup$alias[[i]] == "species") {
+      arg_list <- list(unique_lookup$code[[i]], unique_lookup$genus[[i]])
     } else {
-      arg_list <- list(code[[i]])
+      arg_list <- list(unique_lookup$code[[i]])
     }
 
+    render_call <- DBI::dbSendQuery(con, unique_lookup$query[[i]])
     DBI::dbBind(render_call, arg_list)
     query_out <- DBI::dbFetch(render_call)
+    DBI::dbClearResult(render_call)
 
     if (is_missing(query_out[1, 1])) {
       query_out <- DBI::dbGetQuery(con, default_query)
     }
 
-    call_command[[i]] <- query_out[1, 1]
+    unique_lookup$call_command[[i]] <- query_out[1, 1]
 
   }
 
-  DBI::dbClearResult(render_call)
   DBI::dbDisconnect(con, shutdown = TRUE)
 
-  names(call_command) <- code
-  call_command
+  merge(
+    lookup_tbl,
+    unique_lookup,
+    by = merge_cols
+  )$call_command
 
 }
 
@@ -132,30 +165,23 @@ ftt_fia_sapling_lookup <- function(fia_code) {
 #' @rdname sapling_lookup
 #' @export
 ftt_plants_sapling_lookup <- function(plants_code) {
-  plants_code <- tolower(plants_code)
   ftt_generic_sapling_lookup(plants_code, "plants_code")
 }
 
 #' @rdname sapling_lookup
 #' @export
 ftt_common_name_sapling_lookup <- function(common_name) {
-  common_name <- tolower(common_name)
   ftt_generic_sapling_lookup(common_name, "common_name")
 }
 
 #' @rdname sapling_lookup
 #' @export
 ftt_species_sapling_lookup <- function(species) {
-  species <- tolower(species)
-  species <- strsplit(species, " ")
-  genus <- species[[1]][[1]]
-  species <- paste0(utils::tail(species[[1]], -1), collapse = " ")
-  ftt_generic_sapling_lookup(species, "species", genus)
+  ftt_generic_sapling_lookup(species, "species")
 }
 
 #' @rdname sapling_lookup
 #' @export
 ftt_genus_sapling_lookup <- function(genus) {
-  genus <- tolower(genus)
   ftt_generic_sapling_lookup(genus, "genus")
 }
