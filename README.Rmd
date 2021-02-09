@@ -13,42 +13,151 @@ knitr::opts_chunk$set(
 )
 ```
 
-# forthetrees
+# forthetrees: See the Forest (Using 3D Renders in Blender)
 
 <!-- badges: start -->
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://choosealicense.com/licenses/mit/)
+[![CRAN status](https://www.r-pkg.org/badges/version/forthetrees)](https://CRAN.R-project.org/package=forthetrees)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![codecov](https://codecov.io/gh/mikemahoney218/forthetrees/branch/master/graph/badge.svg)](https://codecov.io/gh/mikemahoney218/forthetrees) 
+[![R build status](https://github.com/mikemahoney218/forthetrees/workflows/R-CMD-check/badge.svg)](https://github.com/mikemahoney218/forthetrees/actions)
+
 <!-- badges: end -->
 
-The goal of forthetrees is to ...
+
+The goal of forthetrees is to help visualize forest landscapes by using 
+user-provided data to produce detailed 3D renders of tree communities, using
+the Blender 3D rendering software.
+
+Please note that this package is in early development; breaking changes can and
+will happen as better approaches become evident. 
+
+## Usage
+
+A long-term target of `forthetrees` is to build helper functions to transform 
+standard plot inventory data into realistic simulations of forest communities 
+(both within and between the sampled plots). At the moment, `forthetrees` 
+provides "exporter" functions that will help to render trees; however, 
+functions to scaffold preprocessing your data are still in development.
+
+As a result, the current version of `forthetrees` requires users to interface a
+little more directly with the [mvdf](https://mikemahoney218.github.io/mvdf/)
+package to specify tree locations in an x/y/z grid. For instance, let's say we
+have a single tree at the origin of our grid ([0, 0, 0]). We can represent that
+tree as an `mvdf_obj`:
+
+```{r}
+library(forthetrees)
+library(mvdf)
+library(magrittr)
+tree_loc <- data.frame(
+  x = 0,
+  y = 0,
+  z = 0
+) %>% 
+  mvdf::mvdf_obj()
+tree_loc
+```
+
+This object only contains the bare minimum amount of information needed to place
+our trees in a scene, but that's okay -- our rendering functions are going to 
+fill in all their other parameters with default values.
+
+For instance, if we want to use the `ftt_add_cakepop` function to create little
+push-pin "trees", we'd use the following block of code:
+
+```{r eval = FALSE}
+create_blender_frontmatter() %>% 
+  ftt_add_cakepop(tree_loc) %>% 
+  add_blender_endmatter("tmp.blend") %>% 
+  execute_render()
+```
+
+Which creates a scene that looks like this:
+
+```{r echo=FALSE}
+knitr::include_graphics("man/figures/readmecake.jpg")
+```
+
+If we wanted more realistic tree shapes, we'd swap out `ftt_add_cakepop` for 
+`ftt_add_sapling`, keeping the rest of our code the same:
+
+```{r eval=FALSE}
+create_blender_frontmatter() %>% 
+  ftt_add_sapling(tree_loc) %>% 
+  add_blender_endmatter("tmp.blend") %>% 
+  execute_render()
+```
+
+And get back a scene that looks more like this:
+
+```{r echo=FALSE}
+knitr::include_graphics("man/figures/readmesap.jpg")
+```
+
+In order to start more heavily customizing our scenes, we need to provide a bit
+more information to our rendering functions! While the functions do have the 
+ability to handle parameters as arguments, `forthetrees` is designed to have you
+specify values when you create your objects. For instance, to grow a different 
+species of sapling we could create an `ftt_treespp` object:
+
+```{r}
+tree_loc <- data.frame(
+  x = 0,
+  y = 0,
+  z = 0,
+  id_key = "balsam fir", # capitalization doesn't matter
+  id_code = "common_name"
+) %>% 
+  ftt_treespp()
+
+tree_loc
+```
+
+Running the exact same code as earlier now plants a conifer in place of our 
+default tree:
+
+```{r eval = FALSE}
+create_blender_frontmatter() %>% 
+  ftt_add_sapling(tree_loc) %>% 
+  add_blender_endmatter("tmp.blend") %>% 
+  execute_render()
+```
+
+```{r echo=FALSE}
+knitr::include_graphics("man/figures/readmebf.jpg")
+```
+
+There are plenty of other knobs to fiddle, ranging from tree size (height and 
+DBH) and color in the current version of forthetrees to texture and growth form
+in an upcoming release.
 
 ## Installation
 
-You can install the released version of forthetrees from [CRAN](https://CRAN.R-project.org) with:
+If the CRAN badge above is green, you can install forthetrees with:
 
 ``` r
 install.packages("forthetrees")
 ```
 
-## Example
+You can always install the development version of forthetrees from 
+[GitHub](https://github.com/mikemahoney218/forthetrees) with:
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-library(forthetrees)
-## basic example code
+``` r
+# install.packages("devtools")
+devtools::install_github("mikemahoney218/forthetrees")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+You'll also need to install [Blender](https://www.blender.org/download/) 
+separately. forthetrees is tested against the current release of Blender and
+is not guaranteed to work with older versions; in particular, sapling 
+generation has notable bugs in Blender < 2.92 and some basic operations may
+fail with Blender < 2.80.
 
-```{r cars}
-summary(cars)
-```
+## Code of Conduct
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/master/examples>.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+Please note that this package is released with a [Contributor
+Code of Conduct](https://ropensci.org/code-of-conduct/). 
+By contributing to this project, you agree to abide by its terms.

@@ -5,9 +5,9 @@
 #'
 #' @template amp_object
 #' @template script
-#' @param id_code
-#' @param id_key
-#' @param location
+#' @param id_code x
+#' @param id_key x
+#' @param location x
 #' @param ... Additional arguments to pass to the sapling creation call.
 #' Currently ignored.
 #'

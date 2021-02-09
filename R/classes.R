@@ -66,10 +66,18 @@ ftt_treesize <- function(data = NULL,
 
   length_out <- length(res_mvdf$idx)
 
-  dbh <- calc_val(dbh, length_out, 0.381)
-  height <- calc_val(height, length_out, 20)
-  crown <- calc_val(crown, length_out, 9.25)
-  crown_radius <- calc_val(crown_radius, length_out, TRUE)
+  tree_params <- solve_tree(dbh = dbh,
+                            height = height,
+                            crown_radius = crown_radius)
+
+  dbh <- tree_params[["dbh"]]
+  height <- tree_params[["height"]]
+  crown_radius <- tree_params[["crown_radius"]]
+
+  dbh <- calc_val(dbh, length_out, dbh)
+  height <- calc_val(height, length_out, height)
+  crown <- calc_val(crown, length_out, TRUE)
+  crown_radius <- calc_val(crown_radius, length_out, crown_radius)
 
   methods::new("ftt_treesize",
                x = as.double(res_mvdf$x),

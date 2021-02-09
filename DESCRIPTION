@@ -1,5 +1,5 @@
 Package: forthetrees
-Title: What the Package Does (One Line, Title Case)
+Title: See the Forest (Using 3D Renders in Blender)
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Michael",
@@ -7,7 +7,10 @@ Authors@R:
            role = c("aut", "cre"),
            email = "mike.mahoney.218@gmail.com",
            comment = c(ORCID = "0000-0003-2402-304X"))
-Description: What the package does (one paragraph).
+Description: Functions for the creation of spatially-accurate and 
+    morphologically-realistic 3D forest visualizations in the Blender 3D 
+    rendering engine. S4 classes allow users to easily compose and export render 
+    scripts allowing for reproducible visualizations and easy modification.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,12 +30,10 @@ Suggests:
 SystemRequirements: 
     Blender
 Imports: 
-    terrainr,
     methods,
-    sp,
-    raster,
     mvdf,
     glue,
     rlang,
     duckdb,
-    DBI
+    DBI,
+    terrainr

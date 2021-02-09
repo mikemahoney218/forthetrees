@@ -60,12 +60,18 @@ setMethod(
            crown_radius = NULL,
            ...) {
 
-    if (is.null(height)) height <- 20
-    if (is.null(dbh)) dbh <- 15 / 39.37 # inches to meters
-    if (is.null(crown_radius)) crown_radius <- dbh * sqrt(dbh * 39.37)
+    tree_params <- solve_tree(dbh = dbh,
+                              height = height,
+                              crown_radius = crown_radius)
 
+    dbh <- tree_params[["dbh"]]
+    height <- tree_params[["height"]]
+    crown_radius <- tree_params[["crown_radius"]]
+
+    # One table for cylinders, one for spheres
     crown_mvdf <- trunk_mvdf <- object
 
+    # Cylinders in Blender have origins at their midpoint
     mvdf::mvdf(trunk_mvdf)$z <- mvdf::mvdf(trunk_mvdf)$z + (height / 2)
 
     if (any(crown == FALSE)) {

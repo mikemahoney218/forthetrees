@@ -4,7 +4,7 @@
 \alias{ftt_generic_sapling_lookup}
 \title{Internal function providing key:value matching for render commands}
 \usage{
-ftt_generic_sapling_lookup(code, alias, genus = NULL)
+ftt_generic_sapling_lookup(code, alias)
 }
 \arguments{
 \item{code}{The code to look up -- FIA code, PLANTS shortcode, or common name}
