@@ -9,3 +9,6 @@
 ^forthetrees\.Rproj$
 man-roxygen
 ^data-raw$
+tmp.blend
+tmp.blend1
+user_abstract.md

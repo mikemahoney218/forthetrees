@@ -9,6 +9,10 @@
 MIT](https://img.shields.io/badge/license-MIT-green)](https://choosealicense.com/licenses/mit/)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/forthetrees)](https://CRAN.R-project.org/package=forthetrees)
+[![Project Status: Concept – Minimal or no implementation has been done
+yet, or the repository is only intended to be a limited example, demo,
+or
+proof-of-concept.](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Project Status: WIP – Initial development is in progress, but there
@@ -25,7 +29,9 @@ user-provided data to produce detailed 3D renders of tree communities,
 using the Blender 3D rendering software.
 
 Please note that this package is in early development; breaking changes
-can and will happen as better approaches become evident.
+can and will happen as better approaches become evident. Development on
+this project has been temporarily paused, but I fully intend to come
+back to this approach in the future.
 
 ## Usage
 
