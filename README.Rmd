@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/forthetrees)](https://CRAN.R-project.org/package=forthetrees)
+[![Codecov test coverage](https://codecov.io/gh/mikemahoney218/forthetrees/branch/main/graph/badge.svg)](https://app.codecov.io/gh/mikemahoney218/forthetrees?branch=main)
+[![R-CMD-check](https://github.com/mikemahoney218/forthetrees/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemahoney218/forthetrees/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of forthetrees is to ...
