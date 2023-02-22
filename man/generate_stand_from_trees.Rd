@@ -39,6 +39,10 @@ stand_area <- sf::st_as_sfc(stand_area)
 
 measured_area <- 19600
 
-generate_stand_from_trees(trees[c("SPECIES", "DBH85")], stand_area, measured_area = measured_area)
+generate_stand_from_trees(
+  tree_positions[c("SPECIES", "DBH85")],
+  stand_area,
+  measured_area = measured_area
+)
 
 }

@@ -9,7 +9,7 @@ test_that("generate_stand_from_trees works", {
     1107,
     expect_snapshot(
       generate_stand_from_trees(
-        trees[c("SPECIES", "DBH85")],
+        tree_positions[c("SPECIES", "DBH85")],
         stand_area,
         measured_area = measured_area
       )
