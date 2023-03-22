@@ -18,8 +18,11 @@
 #'
 #' measured_area <- 19600
 #'
+#' trees <- tree_positions[c("SPECIES", "DBH85")]
+#' trees$SPECIES <- factor(trees$SPECIES)
+#'
 #' generate_stand_from_trees(
-#'   tree_positions[c("SPECIES", "DBH85")],
+#'   trees,
 #'   stand_area,
 #'   measured_area = measured_area
 #' )
@@ -87,8 +90,6 @@ generate_stand_from_trees <- function(data, stand_area, ..., measured_area, cols
     exact = FALSE,
     ...
   )
-  tree_positions <- sf::st_as_sf(tree_positions)
-  sf::st_geometry(tree_positions) <- "geometry"
 
   tree_attributes <- tidyr::nest(
     dplyr::slice_sample(
@@ -99,7 +100,7 @@ generate_stand_from_trees <- function(data, stand_area, ..., measured_area, cols
         ),
         x
       ),
-      n = nrow(tree_positions),
+      n = length(tree_positions),
       replace = TRUE
     ),
     dat = -.rows
@@ -125,7 +126,13 @@ generate_stand_from_trees <- function(data, stand_area, ..., measured_area, cols
     }
   )
 
-  cbind(tree_attributes, tree_positions)
+  output <- sf::st_as_sf(
+    cbind(tree_attributes, tree_positions),
+    crs = sf::st_crs(stand_area)
+  )
+  sf::st_geometry(output) <- "geometry"
+
+  output
 }
 
 simulate_from_data <- function(x, n) {
@@ -142,5 +149,6 @@ simulate_from_continuous_ecdf <- function(x, n) {
 }
 
 simulate_from_categorical <- function(x, n) {
+  x <- as.character(x)
   vapply(runif(n), \(i) x[max(round(i * length(x)), 1)], vector(class(x), 1))
 }
